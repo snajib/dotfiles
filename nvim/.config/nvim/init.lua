@@ -62,7 +62,7 @@ vim.opt.splitbelow = true
 -- Sets how neovim will display certain whitespace characters in the editor.
 --  See `:help 'list'`
 --  and `:help 'listchars'`
-vim.opt.list = true
+vim.opt.list = false
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 
 -- Preview substitutions live, as you type!
@@ -155,13 +155,26 @@ require('lazy').setup({
   -- Use `opts = {}` to force a plugin to be loaded.
   --
 
-  -- Here is a more advanced example where we pass configuration
-  -- options to `gitsigns.nvim`. This is equivalent to the following Lua:
-  --    require('gitsigns').setup({ ... })
-  --
-  -- See `:help gitsigns` to understand what the configuration keys do
-  { -- Adds git related signs to the gutter, as well as utilities for managing changes
+  -- -- Here is a more advanced example where we pass configuration
+  -- -- options to `gitsigns.nvim`. This is equivalent to the following Lua:
+  -- --    require('gitsigns').setup({ ... })
+  -- --
+  -- -- See `:help gitsigns` to understand what the configuration keys do
+  -- { -- Adds git related signs to the gutter, as well as utilities for managing changes
+  --   'lewis6991/gitsigns.nvim',
+  --   opts = {
+  --     signs = {
+  --       add = { text = '+' },
+  --       change = { text = '~' },
+  --       delete = { text = '_' },
+  --       topdelete = { text = '‾' },
+  --       changedelete = { text = '~' },
+  --     },
+  --   },
+  -- },
+  { -- Enhanced Git integration
     'lewis6991/gitsigns.nvim',
+    event = 'VeryLazy',
     opts = {
       signs = {
         add = { text = '+' },
@@ -169,10 +182,100 @@ require('lazy').setup({
         delete = { text = '_' },
         topdelete = { text = '‾' },
         changedelete = { text = '~' },
+        untracked = { text = '┆' },
       },
+      current_line_blame = true, -- Toggle with `:Gitsigns toggle_current_line_blame`
+      current_line_blame_opts = {
+        virt_text = true,
+        virt_text_pos = 'eol', -- 'eol' | 'overlay' | 'right_align'
+        delay = 1000,
+        ignore_whitespace = false,
+      },
+      status_formatter = function(status)
+        local added, changed, removed = status.added, status.changed, status.removed
+        local status_txt = {}
+        if added and added > 0 then
+          table.insert(status_txt, '+' .. added)
+        end
+        if changed and changed > 0 then
+          table.insert(status_txt, '~' .. changed)
+        end
+        if removed and removed > 0 then
+          table.insert(status_txt, '-' .. removed)
+        end
+        return table.concat(status_txt, ' ')
+      end,
+      on_attach = function(bufnr)
+        local gs = package.loaded.gitsigns
+
+        local function map(mode, l, r, opts)
+          opts = opts or {}
+          opts.buffer = bufnr
+          vim.keymap.set(mode, l, r, opts)
+        end
+
+        -- Navigation
+        map('n', ']c', function()
+          if vim.wo.diff then
+            return ']c'
+          end
+          vim.schedule(function()
+            gs.next_hunk()
+          end)
+          return '<Ignore>'
+        end, { expr = true })
+
+        map('n', '[c', function()
+          if vim.wo.diff then
+            return '[c'
+          end
+          vim.schedule(function()
+            gs.prev_hunk()
+          end)
+          return '<Ignore>'
+        end, { expr = true })
+
+        -- Actions
+        map('n', '<leader>hs', gs.stage_hunk, { desc = 'Stage Hunk' })
+        map('n', '<leader>hr', gs.reset_hunk, { desc = 'Reset Hunk' })
+        map('v', '<leader>hs', function()
+          gs.stage_hunk { vim.fn.line '.', vim.fn.line 'v' }
+        end, { desc = 'Stage Hunk' })
+        map('v', '<leader>hr', function()
+          gs.reset_hunk { vim.fn.line '.', vim.fn.line 'v' }
+        end, { desc = 'Reset Hunk' })
+        map('n', '<leader>hS', gs.stage_buffer, { desc = 'Stage Buffer' })
+        map('n', '<leader>hu', gs.undo_stage_hunk, { desc = 'Undo Stage Hunk' })
+        map('n', '<leader>hR', gs.reset_buffer, { desc = 'Reset Buffer' })
+        map('n', '<leader>hp', gs.preview_hunk, { desc = 'Preview Hunk' })
+        map('n', '<leader>hb', function()
+          gs.blame_line { full = true }
+        end, { desc = 'Blame Line' })
+        map('n', '<leader>tb', gs.toggle_current_line_blame, { desc = 'Toggle Line Blame' })
+        map('n', '<leader>hd', gs.diffthis, { desc = 'Diff This' })
+        map('n', '<leader>hD', function()
+          gs.diffthis '~'
+        end, { desc = 'Diff This ~' })
+        map('n', '<leader>td', gs.toggle_deleted, { desc = 'Toggle Deleted' })
+      end,
     },
   },
 
+  {
+    'akinsho/git-conflict.nvim',
+    version = '*',
+    config = function()
+      require('git-conflict').setup {
+        default_mappings = true,
+        highlights = {
+          incoming = 'DiffAdd',
+          current = 'DiffText',
+        },
+      }
+    end,
+  },
+
+  --
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
   --
   -- This is often very useful to both group configuration, as well as handle
@@ -784,12 +887,77 @@ require('lazy').setup({
       -- - sr)'  - [S]urround [R]eplace [)] [']
       require('mini.surround').setup()
 
+      -- Set up git status tracking
+      local gstatus = { ahead = 0, behind = 0 }
+
+      local function update_gstatus()
+        local Job = require 'plenary.job'
+        Job:new({
+          command = 'git',
+          args = { 'rev-list', '--left-right', '--count', 'HEAD...@{upstream}' },
+          on_exit = function(job, _)
+            local res = job:result()[1]
+            if type(res) ~= 'string' then
+              gstatus = { ahead = 0, behind = 0 }
+              return
+            end
+            local ok, ahead, behind = pcall(string.match, res, '(%d+)%s*(%d+)')
+            if not ok then
+              ahead, behind = 0, 0
+            end
+            gstatus = { ahead = tonumber(ahead), behind = tonumber(behind) }
+          end,
+        }):start()
+      end
+
+      -- Set up timer for git status updates
+      if _G.Gstatus_timer == nil then
+        _G.Gstatus_timer = vim.loop.new_timer()
+      else
+        _G.Gstatus_timer:stop()
+      end
+      _G.Gstatus_timer:start(0, 2000, vim.schedule_wrap(update_gstatus))
+
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
       --  and try some other statusline plugin
       local statusline = require 'mini.statusline'
       -- set use_icons to true if you have a Nerd Font
-      statusline.setup { use_icons = vim.g.have_nerd_font }
+      statusline.setup {
+        use_icons = vim.g.have_nerd_font,
+        content = {
+          active = function()
+            local mode, mode_hl = statusline.section_mode { trunc_width = 120 }
+            local git = statusline.section_git { trunc_width = 75 }
+
+            -- Add git ahead/behind status
+            if gstatus.ahead > 0 or gstatus.behind > 0 then
+              local status_text = ''
+              if gstatus.ahead > 0 then
+                status_text = status_text .. '↑' .. gstatus.ahead
+              end
+              if gstatus.behind > 0 then
+                status_text = status_text .. '↓' .. gstatus.behind
+              end
+              git = git .. ' ' .. status_text
+            end
+
+            local diagnostics = statusline.section_diagnostics { trunc_width = 75 }
+            local filename = statusline.section_filename { trunc_width = 140 }
+            local fileinfo = statusline.section_fileinfo { trunc_width = 120 }
+            local location = statusline.section_location { trunc_width = 75 }
+            return statusline.combine_groups {
+              { hl = mode_hl, strings = { mode } },
+              { hl = 'MiniStatuslineDevinfo', strings = { git } },
+              { hl = 'MiniStatuslineFilename', strings = { filename } },
+              '%<', -- Mark general truncate point
+              { hl = 'MiniStatuslineDevinfo', strings = { diagnostics } },
+              { hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
+              { hl = mode_hl, strings = { location } },
+            }
+          end,
+        },
+      }
 
       -- You can configure sections in the statusline by overriding their
       -- default behavior. For example, here we set the section for
@@ -802,6 +970,9 @@ require('lazy').setup({
       -- ... and there is more!
       --  Check out: https://github.com/echasnovski/mini.nvim
     end,
+    dependencies = {
+      'nvim-lua/plenary.nvim', -- Add this dependency
+    },
   },
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
