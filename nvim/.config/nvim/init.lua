@@ -269,6 +269,7 @@ require('lazy').setup({
         debug = false,
         disable_diagnostics = false,
         default_mappings = true,
+        list_opener = 'copen',
         highlights = {
           incoming = 'DiffAdd',
           current = 'DiffText',
