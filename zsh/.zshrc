@@ -33,5 +33,8 @@ direnv() {
     direnv "$@"
 }
 
+# enable fzf
+source <(fzf --zsh)
+
 # Consolidate PATH exports at the end
 export PATH=~/usr/bin:/bin:/usr/sbin:/sbin:$PATH
