@@ -11,6 +11,8 @@ ORANGE=0xfff5a97f
 MAGENTA=0xffc6a0f6
 GREY=0xff939ab7
 TRANSPARENT=0x00000000
+BACKGROUND_1=0x44ffffff  # For the background
+BACKGROUND_2=0x44ffffff  # For the border
 
 # General bar colors
 BAR_COLOR=0xcc24273a #$GREY # Grey bar

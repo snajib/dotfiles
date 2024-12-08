@@ -1,11 +1,10 @@
 #!/bin/bash
 
-echo "called with $1"
-echo "$FOCUSED_WORKSPACE"
+sid=$1
+focused=$(aerospace list-workspaces --focused | head -n1)
 
-if [ "$1" = "$FOCUSED_WORKSPACE" ]; then
-    sketchybar --set $NAME background.drawing=on
+if [ "$sid" = "$focused" ]; then
+    sketchybar --set space.$sid background.drawing=on width=30
 else
-    sketchybar --set $NAME background.drawing=off
+    sketchybar --set space.$sid background.drawing=off width=24
 fi
-

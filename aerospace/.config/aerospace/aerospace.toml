@@ -2,10 +2,8 @@ after-startup-command = ['exec-and-forget sketchybar']
 
 # Notify Sketchybar about workspace change
 exec-on-workspace-change = ['/bin/bash', '-c',
-  'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE',
-  'exec-and-forget borders active_color=0xffe1e3e4 inactive_color=0xff494d64 width=5.0'
+    'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE'
 ]
-
 # Start AeroSpace at login
 start-at-login = true
 
@@ -55,6 +53,10 @@ run = 'layout floating'
 if.app-name-regex-substring = 'finder'
 run = 'layout floating'
 
+[[on-window-detected]]
+if.app-name-regex-substring = 'discord'
+run = 'layout floating'
+
 # Possible values: (qwerty|dvorak)
 # See https://nikitabobko.github.io/AeroSpace/guide#key-mapping
 [key-mapping]
@@ -68,11 +70,11 @@ preset = 'qwerty'
 #                 Monitor pattern is the same as for 'workspace-to-monitor-force-assignment'.
 #                 See: https://nikitabobko.github.io/AeroSpace/guide#assign-workspaces-to-monitors
 [gaps]
-inner.horizontal = 40
-inner.vertical =   40
-outer.left =       40
-outer.bottom =     40
-outer.top =        40
+inner.horizontal = 20
+inner.vertical =   20
+outer.left =       20
+outer.bottom =     20
+outer.top =        20
 outer.right =      80
 
 # 'main' binding mode declaration
@@ -167,3 +169,6 @@ backspace = ['close-all-windows-but-current', 'mode main']
 
 [mode.apps.binding]
 alt-w = ['exec-and-forget open -a /Applications/WezTerm.app', 'mode main']
+
+[exec.env-vars]
+PATH = '/usr/local/bin/:${PATH}'
