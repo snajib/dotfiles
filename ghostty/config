@@ -1,0 +1,14 @@
+font-family=CommitMono Nerd Font
+gtk-titlebar=false
+background-opacity = 0.92
+background-blur
+theme=vesper
+font-size = 16.5
+cursor-opacity=0.9
+
+cursor-style=underline
+cursor-style-blink = false
+shell-integration-features = no-cursor
+
+window-save-state = always
+quit-after-last-window-closed = true
