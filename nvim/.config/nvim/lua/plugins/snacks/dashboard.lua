@@ -49,8 +49,8 @@ return {
           pane = 2,
           {
             { section = "keys", gap = 1, padding = 2 },
-            { section = "startup" },
           },
+          { icon = " ", title = "Projects", section = "projects", indent = 2, padding = 2 },
         },
       },
     },
