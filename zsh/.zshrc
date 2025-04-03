@@ -42,6 +42,9 @@ export BAT_THEME="Nord"
 # fuzzily open multiple files in nvim
 alias ff='fzf -m --preview="bat --color=always {}" --bind "enter:become(nvim {+})"'
 
+# lazygit
+alias lg='lazygit'
+
 # show hidden files
 _comp_options+=(globdots)
 
