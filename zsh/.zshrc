@@ -45,6 +45,9 @@ alias ff='fzf -m --preview="bat --color=always {}" --bind "enter:become(nvim {+}
 # lazygit
 alias lg='lazygit'
 
+# nvim shortcut
+alias vi='nvim'
+
 # show hidden files
 _comp_options+=(globdots)
 
