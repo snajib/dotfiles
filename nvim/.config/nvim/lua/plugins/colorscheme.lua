@@ -1,21 +1,30 @@
 return {
   {
-    "maxmx03/dracula.nvim",
-    lazy = false,
+    "everviolet/nvim",
+    name = "evergarden",
     priority = 1000,
-    config = function()
-      local dracula = require("dracula")
-      dracula.setup({
-        transparent = true, -- This is where transparent option should be set
-        -- rest of your config...
-      })
-      vim.cmd.colorscheme("dracula")
-    end,
+    opts = {
+      theme = {
+        variant = "fall",
+        accent = "green",
+      },
+      editor = {
+        transparent_background = true,
+        sign = { color = "none" },
+        float = {
+          color = "mantle",
+          invert_border = false,
+        },
+        completion = {
+          color = "surface0",
+        },
+      },
+    },
   },
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "dracula",
+      colorscheme = "evergarden",
     },
   },
 }
