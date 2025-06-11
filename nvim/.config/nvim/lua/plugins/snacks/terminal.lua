@@ -1,9 +1,11 @@
 return {
-  "folke/snacks.nvim",
-  opts = {
-    terminal = {
-      win = {
-        position = "float",
+  {
+    "folke/snacks.nvim",
+    opts = {
+      terminal = {
+        win = {
+          position = "float",
+        },
       },
     },
   },
