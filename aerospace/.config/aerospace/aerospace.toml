@@ -169,8 +169,8 @@ f = ['layout floating tiling', 'mode main'] # Toggle between floating and tiling
 backspace = ['close-all-windows-but-current', 'mode main']
 
 # Depending on how path is stored, some computers will need this line for sketchybar to function correctly.
-[exec.env-vars]
-PATH = '/usr/local/bin/:${PATH}'
+# [exec.env-vars]
+# PATH = '/usr/local/bin/:${PATH}'
 
 # Move workspaces to monitors. 1-based indexing on left to right display.
 # See: https://nikitabobko.github.io/AeroSpace/guide#assign-workspaces-to-monitors
