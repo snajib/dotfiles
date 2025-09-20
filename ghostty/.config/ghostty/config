@@ -3,7 +3,7 @@ gtk-titlebar=false
 background-opacity = 0.92
 background-blur
 theme=vesper
-font-size = 16.5
+font-size = 8
 cursor-opacity=0.9
 
 cursor-style=underline
