@@ -1,5 +1,5 @@
 return {
-  "echasnovski/mini.surround",
+  "nvim-mini/mini.surround",
   keys = function(_, keys)
     local opts = LazyVim.opts("mini.surround")
     local mappings = {

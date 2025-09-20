@@ -2,6 +2,8 @@ return {
   "folke/snacks.nvim",
   opts = {
     picker = {
+      hidden = true,
+      -- ignored = true,
       win = {
         input = {
           keys = {
@@ -26,6 +28,7 @@ return {
       sources = {
         files = {
           hidden = true,
+          -- ignored = true,
           ignore = {
             ".DS_Store",
             ".git/",
