@@ -1,12 +1,4 @@
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "markdown",
-  callback = function(event)
-    vim.schedule(function()
-      require("noice.text.markdown").keys(event.buf)
-    end)
-  end,
-})
-
+-- Set 4-space tabs for TypeScript files
 vim.api.nvim_create_autocmd("BufEnter", {
   pattern = { "*.ts", "*.tsx" },
   callback = function()

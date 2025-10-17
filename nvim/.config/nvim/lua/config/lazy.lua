@@ -44,10 +44,3 @@ require("lazy").setup({
     },
   },
 })
-
-return {
-  "LazyVim/LazyVim",
-  opts = {
-    root_patterns = { ".git" },
-  },
-}
