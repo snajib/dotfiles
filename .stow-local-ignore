@@ -1,0 +1,9 @@
+# Stow ignore patterns
+
+\.git
+\.gitignore
+\.DS_Store
+
+^/README.*
+^/readme.*
+^/screenshots
