@@ -1,5 +1,5 @@
 # pnpm
-export PNPM_HOME="/Users/sammy/Library/pnpm"
+export PNPM_HOME="$HOME/Library/pnpm"
 export PATH="$PNPM_HOME:$PATH"
 
 # Lazy load nvm

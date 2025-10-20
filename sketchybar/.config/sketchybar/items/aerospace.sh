@@ -12,6 +12,6 @@
 #         label.font.size=14.0 \
 #         label="$sid" \
 #         click_script="aerospace workspace $sid" \
-#         script="/Users/sammy/dotfiles/sketchybar/.config/sketchybar/plugins/aerospacer.sh $sid"
+#         script="$HOME/dotfiles/sketchybar/.config/sketchybar/plugins/aerospacer.sh $sid"
 # done
 #
