@@ -48,6 +48,16 @@ alias lg='lazygit'
 # nvim shortcut
 alias vi='nvim'
 
+# history shortcut
+unalias hist 2>/dev/null
+hist() {
+  local selected
+  selected=$(history 1 | fzf --tac --no-sort --query "$*" | sed 's/^ *[0-9]* *//')
+  if [[ -n $selected ]]; then
+    print -z "$selected"
+  fi
+}
+
 # show hidden files
 _comp_options+=(globdots)
 
